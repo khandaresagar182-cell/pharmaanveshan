@@ -2035,7 +2035,7 @@ h4.committee-name {
     }
 
     .gov-right {
-        position: absolute;
+        position: absolute !important;
         top: 24px;
         right: 20px;
         width: auto;
@@ -2055,7 +2055,7 @@ h4.committee-name {
     }
 
     .gov-dropdown-menu.show {
-        transform: translateY(0) translateX(-50%) scale(1);
+        transform: translateY(0) scale(1);
     }
 
     .mobile-toggle {
