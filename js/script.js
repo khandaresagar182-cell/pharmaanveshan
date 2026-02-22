@@ -188,6 +188,40 @@ document.addEventListener('DOMContentLoaded', () => {
     const submitBtn = document.getElementById('submitBtn');
     const participationSelect = document.getElementById('participationType');
     const presentationFields = document.getElementById('presentationFields');
+    const regModal = document.getElementById('regModal');
+    const regModalClose = document.getElementById('regModalClose');
+
+    // ── Registration Popup Open/Close ──
+    function closeRegModal() {
+        regModal.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    // Close button
+    regModalClose.addEventListener('click', closeRegModal);
+
+    // Click outside to close
+    regModal.addEventListener('click', (e) => {
+        if (e.target === regModal) closeRegModal();
+    });
+
+    // ESC key to close
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && regModal.classList.contains('active')) closeRegModal();
+    });
+
+    // Override inline onclick to also lock body scroll
+    document.querySelectorAll('[onclick*="regModal"]').forEach(link => {
+        link.removeAttribute('onclick');
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            regModal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            // Close mobile nav if open
+            const navLinks = document.querySelector('.nav-links');
+            if (navLinks) navLinks.classList.remove('active');
+        });
+    });
 
     // Types that do NOT need presentation fields
     const nonPresenterTypes = ['principal', 'tpo', 'industry_representative', 'regulatory_representative'];
@@ -292,6 +326,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const result = await response.json();
 
             if (result.success) {
+                closeRegModal(); // Close registration popup
                 successModal.classList.add('active');
                 regForm.reset();
                 togglePresentationFields(); // Restore default field visibility

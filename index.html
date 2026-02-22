@@ -57,7 +57,8 @@
                         <a href="#about">About</a>
 
                         <a href="#committee">Committee</a>
-                        <a href="#register">Register</a>
+                        <a href="#"
+                            onclick="document.getElementById('regModal').classList.add('active');return false;">Register</a>
                         <a href="#contact">Contact</a>
                     </div>
                 </div>
@@ -113,7 +114,8 @@
             </div>
 
             <div class="hero-cta">
-                <a href="#register" class="btn-primary">Register Now</a>
+                <a href="#" class="btn-primary"
+                    onclick="document.getElementById('regModal').classList.add('active');return false;">Register Now</a>
             </div>
         </div>
     </section>
@@ -399,20 +401,22 @@
 
 
 
-    <!-- ============ REGISTRATION ============ -->
-    <section class="section register" id="register">
-        <div class="container">
-            <div class="section-header">
+    <!-- ============ REGISTRATION POPUP MODAL ============ -->
+    <div class="reg-modal-overlay" id="regModal">
+        <div class="reg-modal">
+            <button class="reg-modal-close" id="regModalClose" aria-label="Close">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round">
+                    <path d="M18 6L6 18M6 6l12 12" />
+                </svg>
+            </button>
+            <div class="reg-modal-header">
                 <span class="section-tag">Registration</span>
-                <h2 class="section-title">Register for Pharma Anveshan 2026</h2>
-                <div class="section-line"></div>
-                <p class="section-desc">Secure your seat</p>
+                <h2>Register for Pharma Anveshan 2026</h2>
+                <p>Secure your seat at the State-Level Conclave</p>
             </div>
-
-            <div class="reg-wrapper" style="grid-template-columns: 1fr; max-width: 700px; margin: 0 auto;">
-
+            <div class="reg-modal-body">
                 <form class="reg-form" id="registrationForm">
-                    <h3>Registration Form</h3>
 
                     <!-- Row 1: Name & Mobile -->
                     <div class="form-row">
@@ -525,7 +529,7 @@
                 </form>
             </div>
         </div>
-    </section>
+    </div>
 
 
 
@@ -596,7 +600,9 @@
                         <li><a href="#about">About Programme</a></li>
 
 
-                        <li><a href="#register">Registration</a></li>
+                        <li><a href="#"
+                                onclick="document.getElementById('regModal').classList.add('active');return false;">Registration</a>
+                        </li>
                         <li><a href="#contact">Contact Us</a></li>
                     </ul>
                 </div>
