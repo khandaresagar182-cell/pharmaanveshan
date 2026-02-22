@@ -1579,6 +1579,13 @@ h4.committee-name {
         0 8px 40px rgba(0, 0, 0, 0.18),
         0 2px 12px rgba(0, 0, 0, 0.1);
     border-radius: 4px;
+    margin: 0 auto;
+    /* Force center alignment */
+}
+
+/* Fix StPageFlip autoCenter bug by centering the internal wrapper */
+.stf__wrapper {
+    margin: 0 auto !important;
 }
 
 .flipbook-page {
