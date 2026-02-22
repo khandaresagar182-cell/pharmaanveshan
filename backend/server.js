@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const { Pool } = require('pg');
-const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -16,14 +16,8 @@ const pool = new Pool({
     ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
 });
 
-// ── Email Transporter (Gmail SMTP) ──
-const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-        user: process.env.SMTP_EMAIL,
-        pass: process.env.SMTP_PASSWORD
-    }
-});
+// ── Resend Email Client (HTTP API — works on Railway) ──
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 // ── Branded HTML Email Builder ──
 function buildConfirmationEmail(data) {
@@ -111,21 +105,26 @@ function buildConfirmationEmail(data) {
 
 // ── Send Confirmation Email (non-blocking) ──
 async function sendConfirmationEmail(registrationData) {
-    if (!process.env.SMTP_EMAIL || !process.env.SMTP_PASSWORD) {
-        console.log('⚠️ SMTP not configured — skipping email');
+    if (!process.env.RESEND_API_KEY) {
+        console.log('⚠️ RESEND_API_KEY not configured — skipping email');
         return;
     }
 
     try {
-        await transporter.sendMail({
-            from: `"Pharma Anveshan 2026" <${process.env.SMTP_EMAIL}>`,
-            to: registrationData.email,
+        const { data, error } = await resend.emails.send({
+            from: 'Pharma Anveshan 2026 <onboarding@resend.dev>',
+            to: [registrationData.email],
             subject: `✅ Registration Confirmed — Pharma Anveshan 2026 (ID #${registrationData.id})`,
             html: buildConfirmationEmail(registrationData)
         });
-        console.log(`📧 Confirmation email sent to ${registrationData.email}`);
+
+        if (error) {
+            console.error(`❌ Email failed for ${registrationData.email}:`, error.message);
+        } else {
+            console.log(`📧 Confirmation email sent to ${registrationData.email} (ID: ${data.id})`);
+        }
     } catch (err) {
-        console.error(`❌ Email failed for ${registrationData.email}:`, err.message);
+        console.error(`❌ Email error for ${registrationData.email}:`, err.message);
     }
 }
 
@@ -326,46 +325,30 @@ app.get('/', (req, res) => {
     res.json({ status: 'ok', service: 'Pharma Anveshan 2026 API' });
 });
 
-// ── SMTP Test Endpoint (temporary) ──
+// ── Email Test Endpoint (temporary) ──
 app.get('/api/test-email', async (req, res) => {
     const email = req.query.to;
     if (!email) return res.status(400).json({ error: 'Provide ?to=email@example.com' });
 
-    if (!process.env.SMTP_EMAIL || !process.env.SMTP_PASSWORD) {
-        return res.json({
-            status: 'fail',
-            error: 'SMTP_EMAIL or SMTP_PASSWORD not set',
-            smtp_email_set: !!process.env.SMTP_EMAIL,
-            smtp_password_set: !!process.env.SMTP_PASSWORD
-        });
+    if (!process.env.RESEND_API_KEY) {
+        return res.json({ status: 'fail', error: 'RESEND_API_KEY not set' });
     }
 
     try {
-        // Verify SMTP connection first
-        await transporter.verify();
-
-        // Send test email
-        const info = await transporter.sendMail({
-            from: `"Pharma Anveshan 2026" <${process.env.SMTP_EMAIL}>`,
-            to: email,
+        const { data, error } = await resend.emails.send({
+            from: 'Pharma Anveshan 2026 <onboarding@resend.dev>',
+            to: [email],
             subject: '🧪 Test Email — Pharma Anveshan 2026',
             html: '<h2 style="color:#0d5c2e;">✅ Email is working!</h2><p>This is a test from Pharma Anveshan 2026 backend.</p>'
         });
 
-        res.json({
-            status: 'success',
-            messageId: info.messageId,
-            from: process.env.SMTP_EMAIL,
-            to: email,
-            response: info.response
-        });
+        if (error) {
+            res.json({ status: 'fail', error: error.message });
+        } else {
+            res.json({ status: 'success', emailId: data.id, to: email });
+        }
     } catch (err) {
-        res.json({
-            status: 'fail',
-            error: err.message,
-            code: err.code,
-            command: err.command
-        });
+        res.json({ status: 'fail', error: err.message });
     }
 });
 
