@@ -38,19 +38,28 @@ async function initDB() {
             );
         `);
 
-        // Migration: ensure new columns exist (handles old table schema)
+        // Migration: fix old table schema
         const migrations = [
+            // Drop removed fields
+            'ALTER TABLE registrations DROP COLUMN IF EXISTS pci_id',
+            // Ensure columns exist
             'ALTER TABLE registrations ADD COLUMN IF NOT EXISTS presentation_category VARCHAR(100)',
             'ALTER TABLE registrations ADD COLUMN IF NOT EXISTS presentation_title TEXT',
             'ALTER TABLE registrations ADD COLUMN IF NOT EXISTS abstract TEXT',
             'ALTER TABLE registrations ADD COLUMN IF NOT EXISTS practical_application TEXT',
             'ALTER TABLE registrations ADD COLUMN IF NOT EXISTS patent_status VARCHAR(100)',
             'ALTER TABLE registrations ADD COLUMN IF NOT EXISTS state VARCHAR(255)',
-            'ALTER TABLE registrations ADD COLUMN IF NOT EXISTS district VARCHAR(255)'
+            'ALTER TABLE registrations ADD COLUMN IF NOT EXISTS district VARCHAR(255)',
+            // Make presentation columns nullable (critical for non-presenter types)
+            'ALTER TABLE registrations ALTER COLUMN presentation_category DROP NOT NULL',
+            'ALTER TABLE registrations ALTER COLUMN presentation_title DROP NOT NULL',
+            'ALTER TABLE registrations ALTER COLUMN abstract DROP NOT NULL',
+            'ALTER TABLE registrations ALTER COLUMN practical_application DROP NOT NULL',
+            'ALTER TABLE registrations ALTER COLUMN patent_status DROP NOT NULL'
         ];
 
         for (const sql of migrations) {
-            try { await client.query(sql); } catch (e) { /* column may already exist */ }
+            try { await client.query(sql); } catch (e) { console.log('Migration skipped:', e.message); }
         }
 
         console.log('✅ Database table ready');
