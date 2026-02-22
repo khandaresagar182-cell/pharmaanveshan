@@ -26,15 +26,14 @@ async function initDB() {
                 email VARCHAR(255) NOT NULL UNIQUE,
                 mobile VARCHAR(20) NOT NULL,
                 institute VARCHAR(500) NOT NULL,
-                district VARCHAR(255) NOT NULL,
                 state VARCHAR(255) NOT NULL,
-                pci_id VARCHAR(100) NOT NULL,
+                district VARCHAR(255) NOT NULL,
                 participation_type VARCHAR(100) NOT NULL,
-                presentation_category VARCHAR(100) NOT NULL,
-                presentation_title TEXT NOT NULL,
-                abstract TEXT NOT NULL,
-                practical_application TEXT NOT NULL,
-                patent_status VARCHAR(100) NOT NULL,
+                presentation_category VARCHAR(100),
+                presentation_title TEXT,
+                abstract TEXT,
+                practical_application TEXT,
+                patent_status VARCHAR(100),
                 created_at TIMESTAMP DEFAULT NOW()
             );
         `);
@@ -55,25 +54,23 @@ function validatePhone(phone) {
     return /^[\+]?[0-9\s\-]{10,15}$/.test(phone);
 }
 
+// Types that do NOT submit presentation fields
+const nonPresenterTypes = ['principal', 'tpo', 'industry_representative', 'regulatory_representative'];
+
 // ── Registration Endpoint ──
 app.post('/api/register', async (req, res) => {
     try {
         const {
             participantName, email, mobile, institute,
-            district, state, pciId, participationType,
+            state, district, participationType,
             presentationCategory, presentationTitle,
             abstract, practicalApplication, patentStatus
         } = req.body;
 
-        // Required field validation
-        const requiredFields = {
-            participantName, email, mobile, institute,
-            district, state, pciId, participationType,
-            presentationCategory, presentationTitle,
-            abstract, practicalApplication, patentStatus
-        };
+        // Required field validation — base fields
+        const baseRequired = { participantName, email, mobile, institute, state, district, participationType };
 
-        const missingFields = Object.entries(requiredFields)
+        const missingFields = Object.entries(baseRequired)
             .filter(([_, value]) => !value || !String(value).trim())
             .map(([key]) => key);
 
@@ -83,6 +80,24 @@ app.post('/api/register', async (req, res) => {
                 message: 'Please fill in all required fields.',
                 missingFields
             });
+        }
+
+        // Check if presenter type — presentation fields required
+        const isPresenter = !nonPresenterTypes.includes(participationType);
+
+        if (isPresenter) {
+            const presenterRequired = { presentationCategory, presentationTitle, abstract, practicalApplication, patentStatus };
+            const missingPresenter = Object.entries(presenterRequired)
+                .filter(([_, value]) => !value || !String(value).trim())
+                .map(([key]) => key);
+
+            if (missingPresenter.length > 0) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Please fill in all presentation fields.',
+                    missingFields: missingPresenter
+                });
+            }
         }
 
         // Email validation
@@ -106,20 +121,24 @@ app.post('/api/register', async (req, res) => {
         // Insert into database
         const result = await pool.query(
             `INSERT INTO registrations 
-                (participant_name, email, mobile, institute, district, state, pci_id, 
+                (participant_name, email, mobile, institute, state, district,
                  participation_type, presentation_category, presentation_title, 
                  abstract, practical_application, patent_status)
-             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
              RETURNING id, created_at`,
             [
                 participantName.trim(), email.trim().toLowerCase(), mobile.trim(),
-                institute.trim(), district.trim(), state.trim(), pciId.trim(),
-                participationType, presentationCategory, presentationTitle.trim(),
-                abstract.trim(), practicalApplication.trim(), patentStatus
+                institute.trim(), state.trim(), district.trim(),
+                participationType,
+                isPresenter ? presentationCategory : null,
+                isPresenter ? (presentationTitle || '').trim() : null,
+                isPresenter ? (abstract || '').trim() : null,
+                isPresenter ? (practicalApplication || '').trim() : null,
+                isPresenter ? patentStatus : null
             ]
         );
 
-        console.log(`✅ Registration #${result.rows[0].id} saved`);
+        console.log(`✅ Registration #${result.rows[0].id} saved (${participationType})`);
 
         res.status(201).json({
             success: true,

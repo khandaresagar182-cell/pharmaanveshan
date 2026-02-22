@@ -434,86 +434,83 @@
                             <input type="email" id="email" name="email" placeholder="Enter your email" required>
                         </div>
                         <div class="form-group">
-                            <label for="institute">Name of Institute <span class="req">*</span></label>
-                            <input type="text" id="institute" name="institute" placeholder="Enter your institute name"
-                                required>
+                            <label for="institute">Name of Institute / Organisation <span class="req">*</span></label>
+                            <input type="text" id="institute" name="institute"
+                                placeholder="Enter your institute or organisation" required>
                         </div>
                     </div>
 
-                    <!-- Row 3: District & State -->
+                    <!-- Row 3: State & District -->
                     <div class="form-row">
-                        <div class="form-group">
-                            <label for="district">District <span class="req">*</span></label>
-                            <input type="text" id="district" name="district" placeholder="Enter your district" required>
-                        </div>
                         <div class="form-group">
                             <label for="state">State <span class="req">*</span></label>
                             <input type="text" id="state" name="state" placeholder="Enter your state" required>
                         </div>
+                        <div class="form-group">
+                            <label for="district">District <span class="req">*</span></label>
+                            <input type="text" id="district" name="district" placeholder="Enter your district" required>
+                        </div>
                     </div>
 
-                    <!-- Row 4: PCI ID & Type of Participation -->
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="pciId">PCI ID of Institute <span class="req">*</span></label>
-                            <input type="text" id="pciId" name="pciId" placeholder="Enter PCI ID" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="participationType">Type of Participation <span class="req">*</span></label>
-                            <select id="participationType" name="participationType" required>
-                                <option value="">Select type of participation</option>
-                                <option value="principal">Principal</option>
-                                <option value="tpo">TPO</option>
-                                <option value="pg_student">PG Student</option>
-                                <option value="phd_scholar">PhD Scholar</option>
-                                <option value="researcher">Researcher</option>
+                    <!-- Type of Participation -->
+                    <div class="form-group full-width">
+                        <label for="participationType">Type of Participation <span class="req">*</span></label>
+                        <select id="participationType" name="participationType" required>
+                            <option value="">Select type of participation</option>
+                            <option value="principal">Principal</option>
+                            <option value="tpo">TPO</option>
+                            <option value="industry_representative">Industry Representative</option>
+                            <option value="regulatory_representative">Regulatory Representative</option>
+                            <option value="pg_student">PG Student</option>
+                            <option value="phd_scholar">PhD Scholar</option>
+                            <option value="researcher">Researcher</option>
+                        </select>
+                    </div>
+
+                    <!-- ═══ Presentation Fields (conditional — hidden for Principal/TPO/Industry/Regulatory) ═══ -->
+                    <div id="presentationFields" class="presentation-fields">
+
+                        <div class="form-group full-width">
+                            <label for="presentationCategory">Category of Presentation <span
+                                    class="req">*</span></label>
+                            <select id="presentationCategory" name="presentationCategory">
+                                <option value="">Select category of presentation</option>
+                                <option value="poster">1. Poster Presentation (Industry Scalable Potential Research)
+                                </option>
+                                <option value="oral">2. Oral Presentation of Patent</option>
+                                <option value="model">3. Model Presentation of Patent</option>
                             </select>
                         </div>
-                    </div>
 
-                    <!-- Category of Presentation -->
-                    <div class="form-group full-width">
-                        <label for="presentationCategory">Category of Presentation <span class="req">*</span></label>
-                        <select id="presentationCategory" name="presentationCategory" required>
-                            <option value="">Select category of presentation</option>
-                            <option value="poster">1. Poster Presentation (Industry Scalable Potential Research)
-                            </option>
-                            <option value="oral">2. Oral Presentation of Patent</option>
-                            <option value="model">3. Model Presentation of Patent</option>
-                        </select>
-                    </div>
+                        <div class="form-group full-width">
+                            <label for="presentationTitle">Title of Presentation <span class="req">*</span></label>
+                            <input type="text" id="presentationTitle" name="presentationTitle"
+                                placeholder="Enter the title of your presentation">
+                        </div>
 
-                    <!-- Title of Presentation -->
-                    <div class="form-group full-width">
-                        <label for="presentationTitle">Title of Presentation <span class="req">*</span></label>
-                        <input type="text" id="presentationTitle" name="presentationTitle"
-                            placeholder="Enter the title of your presentation" required>
-                    </div>
+                        <div class="form-group full-width">
+                            <label for="abstract">Abstract <span class="req">*</span></label>
+                            <textarea id="abstract" name="abstract" rows="4"
+                                placeholder="Enter the abstract of your presentation"></textarea>
+                        </div>
 
-                    <!-- Abstract -->
-                    <div class="form-group full-width">
-                        <label for="abstract">Abstract <span class="req">*</span></label>
-                        <textarea id="abstract" name="abstract" rows="4"
-                            placeholder="Enter the abstract of your presentation" required></textarea>
-                    </div>
+                        <div class="form-group full-width">
+                            <label for="practicalApplication">Practical Application <span class="req">*</span></label>
+                            <textarea id="practicalApplication" name="practicalApplication" rows="3"
+                                placeholder="Describe the practical application"></textarea>
+                        </div>
 
-                    <!-- Practical Application -->
-                    <div class="form-group full-width">
-                        <label for="practicalApplication">Practical Application <span class="req">*</span></label>
-                        <textarea id="practicalApplication" name="practicalApplication" rows="3"
-                            placeholder="Describe the practical application" required></textarea>
-                    </div>
+                        <div class="form-group full-width">
+                            <label for="patentStatus">Status of Patent <span class="req">*</span></label>
+                            <select id="patentStatus" name="patentStatus">
+                                <option value="">Select status of patent</option>
+                                <option value="published_national">1. Published National</option>
+                                <option value="granted_national">2. Granted National</option>
+                                <option value="published_international">3. Published International</option>
+                                <option value="granted_international">4. Granted International</option>
+                            </select>
+                        </div>
 
-                    <!-- Status of Patent -->
-                    <div class="form-group full-width">
-                        <label for="patentStatus">Status of Patent <span class="req">*</span></label>
-                        <select id="patentStatus" name="patentStatus" required>
-                            <option value="">Select status of patent</option>
-                            <option value="published_national">1. Published National</option>
-                            <option value="granted_national">2. Granted National</option>
-                            <option value="published_international">3. Published International</option>
-                            <option value="granted_international">4. Granted International</option>
-                        </select>
                     </div>
 
                     <button type="submit" class="btn-submit" id="submitBtn">

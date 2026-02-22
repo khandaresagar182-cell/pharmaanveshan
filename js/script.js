@@ -186,6 +186,33 @@ document.addEventListener('DOMContentLoaded', () => {
     const errorModal = document.getElementById('errorModal');
     const errorMessage = document.getElementById('errorMessage');
     const submitBtn = document.getElementById('submitBtn');
+    const participationSelect = document.getElementById('participationType');
+    const presentationFields = document.getElementById('presentationFields');
+
+    // Types that do NOT need presentation fields
+    const nonPresenterTypes = ['principal', 'tpo', 'industry_representative', 'regulatory_representative'];
+
+    // ── Conditional Show/Hide of Presentation Fields ──
+    function togglePresentationFields() {
+        const selectedType = participationSelect.value;
+        const isNonPresenter = nonPresenterTypes.includes(selectedType);
+
+        if (isNonPresenter) {
+            presentationFields.classList.add('hidden');
+            // Clear values and errors from hidden fields
+            presentationFields.querySelectorAll('input, select, textarea').forEach(f => {
+                f.value = '';
+                f.classList.remove('field-error');
+            });
+            presentationFields.querySelectorAll('.field-error-msg').forEach(el => el.remove());
+        } else {
+            presentationFields.classList.remove('hidden');
+        }
+    }
+
+    participationSelect.addEventListener('change', togglePresentationFields);
+    // Initialize on load (in case of browser back/auto-fill)
+    togglePresentationFields();
 
     // Clear field error on input
     regForm.querySelectorAll('input, select, textarea').forEach(field => {
@@ -221,10 +248,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const formData = new FormData(regForm);
         const data = Object.fromEntries(formData.entries());
 
-        // Client-side validation
-        const requiredFields = ['participantName', 'email', 'mobile', 'institute', 'district', 'state', 'pciId', 'participationType', 'presentationCategory', 'presentationTitle', 'abstract', 'practicalApplication', 'patentStatus'];
-        let hasError = false;
+        // Determine if this is a presenter type
+        const isPresenter = !nonPresenterTypes.includes(data.participationType);
 
+        // Client-side validation — base fields always required
+        const baseFields = ['participantName', 'mobile', 'email', 'institute', 'state', 'district', 'participationType'];
+        const presenterFields = ['presentationCategory', 'presentationTitle', 'abstract', 'practicalApplication', 'patentStatus'];
+        const requiredFields = isPresenter ? [...baseFields, ...presenterFields] : baseFields;
+
+        let hasError = false;
         for (const field of requiredFields) {
             if (!data[field] || !data[field].trim()) {
                 showFieldError(field, 'This field is required');
@@ -262,6 +294,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (result.success) {
                 successModal.classList.add('active');
                 regForm.reset();
+                togglePresentationFields(); // Restore default field visibility
             } else {
                 // Highlight specific field if backend returns it
                 if (result.field) {

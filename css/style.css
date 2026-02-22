@@ -2175,6 +2175,26 @@ h4.committee-name {
     margin-bottom: 16px;
 }
 
+/* Presentation Fields — Conditional Visibility */
+.presentation-fields {
+    overflow: hidden;
+    max-height: 2000px;
+    opacity: 1;
+    transition: max-height 0.4s ease, opacity 0.3s ease, margin 0.3s ease;
+    margin-top: 8px;
+    border-top: 1px dashed var(--border);
+    padding-top: 16px;
+}
+
+.presentation-fields.hidden {
+    max-height: 0;
+    opacity: 0;
+    margin-top: 0;
+    padding-top: 0;
+    border-top: none;
+    pointer-events: none;
+}
+
 .form-group label {
     font-family: var(--font-heading);
     font-size: 0.85rem;
