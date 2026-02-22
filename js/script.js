@@ -131,13 +131,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // ── Initialize StPageFlip ──
             const pageFlip = new St.PageFlip(flipbookEl, {
-                width: 550,
-                height: 733,
-                size: 'stretch',
+                width: 556,        // Match image actual width
+                height: 984,       // Match image actual height
+                size: 'stretch',   // Let it scale down on small screens
                 minWidth: 280,
-                minHeight: 373,
-                maxWidth: 650,
-                maxHeight: 866,
+                minHeight: 495,    // Maintained aspect ratio
+                maxWidth: 600,     // Allow slight upscale up to 600
+                maxHeight: 1061,   // Maintained aspect ratio
                 drawShadow: true,
                 maxShadowOpacity: 0.35,
                 flippingTime: 800,
