@@ -184,8 +184,7 @@ app.post('/api/register', async (req, res) => {
         console.error('❌ Registration error:', err.message, err.stack);
         res.status(500).json({
             success: false,
-            message: 'Something went wrong. Please try again later.',
-            debug: err.message
+            message: 'Something went wrong. Please try again later.'
         });
     }
 });
@@ -208,18 +207,18 @@ app.get('/api/registrations', async (req, res) => {
     }
 });
 
-// ── Debug: Check Table Schema ──
-app.get('/api/debug/schema', async (req, res) => {
+// ── Delete Registration by ID (admin) ──
+app.delete('/api/registrations/:id', async (req, res) => {
     try {
-        const result = await pool.query(`
-            SELECT column_name, data_type, is_nullable, column_default
-            FROM information_schema.columns 
-            WHERE table_name = 'registrations'
-            ORDER BY ordinal_position
-        `);
-        res.json({ success: true, columns: result.rows });
+        const { id } = req.params;
+        const result = await pool.query('DELETE FROM registrations WHERE id = $1 RETURNING id', [id]);
+        if (result.rows.length === 0) {
+            return res.status(404).json({ success: false, message: 'Registration not found.' });
+        }
+        res.json({ success: true, message: `Registration #${id} deleted.` });
     } catch (err) {
-        res.status(500).json({ success: false, error: err.message });
+        console.error('❌ Delete error:', err.message);
+        res.status(500).json({ success: false, message: 'Failed to delete registration.' });
     }
 });
 
