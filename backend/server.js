@@ -17,7 +17,7 @@ const pool = new Pool({
 });
 
 // ── Resend Email Client (HTTP API — works on Railway) ──
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
 // ── Branded HTML Email Builder ──
 function buildConfirmationEmail(data) {
@@ -105,8 +105,8 @@ function buildConfirmationEmail(data) {
 
 // ── Send Confirmation Email (non-blocking) ──
 async function sendConfirmationEmail(registrationData) {
-    if (!process.env.RESEND_API_KEY) {
-        console.log('⚠️ RESEND_API_KEY not configured — skipping email');
+    if (!resend) {
+        console.log('⚠️ Resend not configured — skipping email');
         return;
     }
 
@@ -330,7 +330,7 @@ app.get('/api/test-email', async (req, res) => {
     const email = req.query.to;
     if (!email) return res.status(400).json({ error: 'Provide ?to=email@example.com' });
 
-    if (!process.env.RESEND_API_KEY) {
+    if (!resend) {
         return res.json({ status: 'fail', error: 'RESEND_API_KEY not set' });
     }
 
