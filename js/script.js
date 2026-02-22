@@ -179,7 +179,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 6. REGISTRATION FORM SUBMISSION
     // ──────────────────────────────────────
     // ⚠️ UPDATE THIS after deploying backend to Railway
-    const API_URL = 'https://pharmaanveshan-backend-production.up.railway.app';
+    const API_URL = 'https://pharmaanveshan-production.up.railway.app';
 
     const regForm = document.getElementById('registrationForm');
     const successModal = document.getElementById('successModal');
