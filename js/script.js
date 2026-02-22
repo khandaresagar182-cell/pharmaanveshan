@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
     timelineItems.forEach(item => timelineObserver.observe(item));
 
     // ──────────────────────────────────────
-    // 5. PCI BOOKLET — FLIPBOOK (PDF.js + StPageFlip)
+    // 5. PCI BOOKLET — FLIPBOOK (Static Images + StPageFlip)
     // ──────────────────────────────────────
     (async function initFlipbook() {
         const flipbookEl = document.getElementById('flipbook');
@@ -95,59 +95,20 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!flipbookEl || typeof St === 'undefined') return;
 
         try {
-            let pageImageSrcs = [];
+            const pageImageSrcs = [];
+            const totalPossible = 40;
 
-            // ── Strategy 1: PDF.js runtime rendering (best quality) ──
-            if (typeof pdfjsLib !== 'undefined') {
-                try {
-                    // Try loading the local PDF first, then Google Drive
-                    let pdf = null;
-                    try {
-                        pdf = await pdfjsLib.getDocument('assets/booklet.pdf').promise;
-                    } catch (localErr) {
-                        // Local file failed (CORS on file://), try Google Drive URL
-                        const driveId = '1Ob4B8oV6dn_eK-PBQyUlddLR1Z-XIsmV';
-                        const driveUrl = `https://drive.google.com/uc?export=download&id=${driveId}`;
-                        pdf = await pdfjsLib.getDocument(driveUrl).promise;
-                    }
-
-                    const totalPages = pdf.numPages;
-                    loadingEl.querySelector('p').textContent = `Rendering pages… 0/${totalPages}`;
-
-                    for (let i = 1; i <= totalPages; i++) {
-                        const page = await pdf.getPage(i);
-                        const scale = 2; // 2x for retina quality
-                        const viewport = page.getViewport({ scale });
-                        const canvas = document.createElement('canvas');
-                        canvas.width = viewport.width;
-                        canvas.height = viewport.height;
-                        const ctx = canvas.getContext('2d');
-                        ctx.fillStyle = '#ffffff';
-                        ctx.fillRect(0, 0, canvas.width, canvas.height);
-                        await page.render({ canvasContext: ctx, viewport }).promise;
-                        pageImageSrcs.push(canvas.toDataURL('image/jpeg', 0.92));
-                        loadingEl.querySelector('p').textContent = `Rendering pages… ${i}/${totalPages}`;
-                    }
-                } catch (pdfErr) {
-                    console.warn('PDF.js load failed, trying static images:', pdfErr.message);
-                    pageImageSrcs = []; // clear and try fallback
-                }
-            }
-
-            // ── Strategy 2: Pre-rendered static images (fallback) ──
-            if (pageImageSrcs.length === 0) {
-                const totalPossible = 40;
-                for (let i = 1; i <= totalPossible; i++) {
-                    const num = String(i).padStart(2, '0');
-                    const src = `assets/images/booklet/page-${num}.png`;
-                    const exists = await new Promise(resolve => {
-                        const img = new Image();
-                        img.onload = () => resolve(src);
-                        img.onerror = () => resolve(null);
-                        img.src = src;
-                    });
-                    if (exists) pageImageSrcs.push(exists);
-                }
+            // Load pre-rendered static images provided by user
+            for (let i = 1; i <= totalPossible; i++) {
+                const num = String(i).padStart(2, '0');
+                const src = `assets/images/booklet/page-${num}.png`;
+                const exists = await new Promise(resolve => {
+                    const img = new Image();
+                    img.onload = () => resolve(src);
+                    img.onerror = () => resolve(null);
+                    img.src = src;
+                });
+                if (exists) pageImageSrcs.push(exists);
             }
 
             if (pageImageSrcs.length === 0) {
@@ -217,7 +178,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         } catch (err) {
             console.error('Flipbook init error:', err);
-            loadingEl.innerHTML = '<p style="color: #e74c3c;">Could not load booklet. Please try refreshing.</p>';
+            loadingEl.innerHTML = '<p style="color: #e74c3c;">Could not load booklet: ' + err.message + '</p>';
         }
     })();
 
