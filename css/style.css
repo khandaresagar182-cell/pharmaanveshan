@@ -2476,7 +2476,7 @@ h4.committee-name {
 }
 
 .reg-modal-body {
-    padding: 24px 36px 32px;
+    padding: 24px 36px 0;
     overflow-y: auto;
     flex: 1;
 }
@@ -2485,6 +2485,15 @@ h4.committee-name {
     border: none;
     box-shadow: none;
     padding: 0;
+    padding-bottom: 80px;
+}
+
+.reg-modal-body .btn-submit {
+    position: sticky;
+    bottom: 0;
+    z-index: 5;
+    margin-top: 16px;
+    box-shadow: 0 -8px 24px rgba(255, 255, 255, 0.95);
 }
 
 /* ── Success + Error Modals ── */
