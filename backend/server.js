@@ -326,6 +326,49 @@ app.get('/', (req, res) => {
     res.json({ status: 'ok', service: 'Pharma Anveshan 2026 API' });
 });
 
+// ── SMTP Test Endpoint (temporary) ──
+app.get('/api/test-email', async (req, res) => {
+    const email = req.query.to;
+    if (!email) return res.status(400).json({ error: 'Provide ?to=email@example.com' });
+
+    if (!process.env.SMTP_EMAIL || !process.env.SMTP_PASSWORD) {
+        return res.json({
+            status: 'fail',
+            error: 'SMTP_EMAIL or SMTP_PASSWORD not set',
+            smtp_email_set: !!process.env.SMTP_EMAIL,
+            smtp_password_set: !!process.env.SMTP_PASSWORD
+        });
+    }
+
+    try {
+        // Verify SMTP connection first
+        await transporter.verify();
+
+        // Send test email
+        const info = await transporter.sendMail({
+            from: `"Pharma Anveshan 2026" <${process.env.SMTP_EMAIL}>`,
+            to: email,
+            subject: '🧪 Test Email — Pharma Anveshan 2026',
+            html: '<h2 style="color:#0d5c2e;">✅ Email is working!</h2><p>This is a test from Pharma Anveshan 2026 backend.</p>'
+        });
+
+        res.json({
+            status: 'success',
+            messageId: info.messageId,
+            from: process.env.SMTP_EMAIL,
+            to: email,
+            response: info.response
+        });
+    } catch (err) {
+        res.json({
+            status: 'fail',
+            error: err.message,
+            code: err.code,
+            command: err.command
+        });
+    }
+});
+
 // ── Get All Registrations (admin) ──
 app.get('/api/registrations', async (req, res) => {
     try {
