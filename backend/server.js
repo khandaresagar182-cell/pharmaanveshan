@@ -37,6 +37,22 @@ async function initDB() {
                 created_at TIMESTAMP DEFAULT NOW()
             );
         `);
+
+        // Migration: ensure new columns exist (handles old table schema)
+        const migrations = [
+            'ALTER TABLE registrations ADD COLUMN IF NOT EXISTS presentation_category VARCHAR(100)',
+            'ALTER TABLE registrations ADD COLUMN IF NOT EXISTS presentation_title TEXT',
+            'ALTER TABLE registrations ADD COLUMN IF NOT EXISTS abstract TEXT',
+            'ALTER TABLE registrations ADD COLUMN IF NOT EXISTS practical_application TEXT',
+            'ALTER TABLE registrations ADD COLUMN IF NOT EXISTS patent_status VARCHAR(100)',
+            'ALTER TABLE registrations ADD COLUMN IF NOT EXISTS state VARCHAR(255)',
+            'ALTER TABLE registrations ADD COLUMN IF NOT EXISTS district VARCHAR(255)'
+        ];
+
+        for (const sql of migrations) {
+            try { await client.query(sql); } catch (e) { /* column may already exist */ }
+        }
+
         console.log('✅ Database table ready');
     } catch (err) {
         console.error('❌ DB init error:', err.message);
@@ -156,10 +172,11 @@ app.post('/api/register', async (req, res) => {
             });
         }
 
-        console.error('❌ Registration error:', err.message);
+        console.error('❌ Registration error:', err.message, err.stack);
         res.status(500).json({
             success: false,
-            message: 'Something went wrong. Please try again later.'
+            message: 'Something went wrong. Please try again later.',
+            debug: err.message
         });
     }
 });
@@ -179,6 +196,21 @@ app.get('/api/registrations', async (req, res) => {
     } catch (err) {
         console.error('❌ Fetch error:', err.message);
         res.status(500).json({ success: false, message: 'Failed to fetch registrations.' });
+    }
+});
+
+// ── Debug: Check Table Schema ──
+app.get('/api/debug/schema', async (req, res) => {
+    try {
+        const result = await pool.query(`
+            SELECT column_name, data_type, is_nullable, column_default
+            FROM information_schema.columns 
+            WHERE table_name = 'registrations'
+            ORDER BY ordinal_position
+        `);
+        res.json({ success: true, columns: result.rows });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
     }
 });
 
