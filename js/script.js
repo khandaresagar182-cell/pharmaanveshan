@@ -162,21 +162,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (e.key === 'ArrowLeft') pageFlip.flipPrev();
             });
 
-            // ── Auto-Open Animation ──
-            // Automatically flip open the cover when the user scrolls to it
-            // and auto-close the book if they scroll past it (optional invitation)
-            const observer = new IntersectionObserver((entries) => {
-                if (entries[0].isIntersecting) {
-                    if (pageFlip.getCurrentPageIndex() === 0) {
-                        setTimeout(() => {
-                            pageFlip.flipNext('top'); // 'top' gives a nice opening corner lift
-                        }, 800);
-                    }
-                    observer.disconnect();
-                }
-            }, { threshold: 0.6 });
-            observer.observe(stageEl);
-
             // Show flipbook
             loadingEl.classList.add('hidden');
             stageEl.classList.add('active');
