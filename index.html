@@ -656,6 +656,17 @@
         </div>
     </div>
 
+    <!-- Error Modal -->
+    <div class="modal-overlay" id="errorModal">
+        <div class="modal-box modal-error">
+            <div class="modal-icon">❌</div>
+            <h3>Registration Failed</h3>
+            <p id="errorMessage">Something went wrong. Please try again.</p>
+            <button class="btn-primary" onclick="document.getElementById('errorModal').classList.remove('active')">Try
+                Again</button>
+        </div>
+    </div>
+
     <!-- Flipbook Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script>pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';</script>

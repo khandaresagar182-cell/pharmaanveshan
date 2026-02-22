@@ -178,48 +178,116 @@ document.addEventListener('DOMContentLoaded', () => {
     // ──────────────────────────────────────
     // 6. REGISTRATION FORM SUBMISSION
     // ──────────────────────────────────────
+    // ⚠️ UPDATE THIS after deploying backend to Railway
+    const API_URL = 'https://pharmaanveshan-backend-production.up.railway.app';
+
     const regForm = document.getElementById('registrationForm');
     const successModal = document.getElementById('successModal');
+    const errorModal = document.getElementById('errorModal');
+    const errorMessage = document.getElementById('errorMessage');
+    const submitBtn = document.getElementById('submitBtn');
 
-    regForm.addEventListener('submit', (e) => {
+    // Clear field error on input
+    regForm.querySelectorAll('input, select, textarea').forEach(field => {
+        field.addEventListener('input', () => {
+            field.classList.remove('field-error');
+            const errEl = field.parentElement.querySelector('.field-error-msg');
+            if (errEl) errEl.remove();
+        });
+    });
+
+    function showFieldError(fieldId, message) {
+        const field = document.getElementById(fieldId);
+        if (!field) return;
+        field.classList.add('field-error');
+        // Remove existing error msg if any
+        const existing = field.parentElement.querySelector('.field-error-msg');
+        if (existing) existing.remove();
+        const errEl = document.createElement('span');
+        errEl.className = 'field-error-msg';
+        errEl.textContent = message;
+        field.parentElement.appendChild(errEl);
+        field.focus();
+    }
+
+    regForm.addEventListener('submit', async (e) => {
         e.preventDefault();
+
+        // Clear previous errors
+        regForm.querySelectorAll('.field-error').forEach(el => el.classList.remove('field-error'));
+        regForm.querySelectorAll('.field-error-msg').forEach(el => el.remove());
 
         // Collect form data
         const formData = new FormData(regForm);
         const data = Object.fromEntries(formData.entries());
 
-        // Simple validation
-        if (!data.participantName || !data.email || !data.mobile || !data.institute || !data.district || !data.state || !data.pciId || !data.participationType || !data.presentationCategory || !data.presentationTitle || !data.abstract || !data.practicalApplication || !data.patentStatus) {
-            alert('Please fill in all required fields.');
-            return;
+        // Client-side validation
+        const requiredFields = ['participantName', 'email', 'mobile', 'institute', 'district', 'state', 'pciId', 'participationType', 'presentationCategory', 'presentationTitle', 'abstract', 'practicalApplication', 'patentStatus'];
+        let hasError = false;
+
+        for (const field of requiredFields) {
+            if (!data[field] || !data[field].trim()) {
+                showFieldError(field, 'This field is required');
+                if (!hasError) hasError = true;
+            }
         }
+        if (hasError) return;
 
         // Email validation
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(data.email)) {
-            alert('Please enter a valid email address.');
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
+            showFieldError('email', 'Please enter a valid email address');
             return;
         }
 
-        // Phone validation (Indian number)
-        const phoneRegex = /^[\+]?[0-9\s\-]{10,15}$/;
-        if (!phoneRegex.test(data.mobile)) {
-            alert('Please enter a valid phone number.');
+        // Phone validation
+        if (!/^[\+]?[0-9\s\-]{10,15}$/.test(data.mobile)) {
+            showFieldError('mobile', 'Please enter a valid mobile number');
             return;
         }
 
-        console.log('Registration Data:', data);
+        // Show loading state
+        submitBtn.disabled = true;
+        submitBtn.classList.add('loading');
+        submitBtn.querySelector('span').textContent = 'Submitting...';
 
-        // Show success modal
-        successModal.classList.add('active');
-        regForm.reset();
+        try {
+            const response = await fetch(`${API_URL}/api/register`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                successModal.classList.add('active');
+                regForm.reset();
+            } else {
+                // Highlight specific field if backend returns it
+                if (result.field) {
+                    showFieldError(result.field, result.message);
+                } else {
+                    errorMessage.textContent = result.message || 'Registration failed. Please try again.';
+                    errorModal.classList.add('active');
+                }
+            }
+        } catch (err) {
+            console.error('Registration error:', err);
+            errorMessage.textContent = 'Network error. Please check your connection and try again.';
+            errorModal.classList.add('active');
+        } finally {
+            // Reset button
+            submitBtn.disabled = false;
+            submitBtn.classList.remove('loading');
+            submitBtn.querySelector('span').textContent = 'Submit Registration';
+        }
     });
 
-    // Close modal on overlay click
-    successModal.addEventListener('click', (e) => {
-        if (e.target === successModal) {
-            successModal.classList.remove('active');
-        }
+    // Close modals on overlay click
+    [successModal, errorModal].forEach(modal => {
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) modal.classList.remove('active');
+        });
     });
 
     // ──────────────────────────────────────
