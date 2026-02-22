@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const { Pool } = require('pg');
+const nodemailer = require('nodemailer');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -14,6 +15,119 @@ const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
     ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
 });
+
+// ── Email Transporter (Gmail SMTP) ──
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: process.env.SMTP_EMAIL,
+        pass: process.env.SMTP_PASSWORD
+    }
+});
+
+// ── Branded HTML Email Builder ──
+function buildConfirmationEmail(data) {
+    const typeLabels = {
+        principal: 'Principal',
+        tpo: 'TPO',
+        industry_representative: 'Industry Representative',
+        regulatory_representative: 'Regulatory Representative',
+        pg_student: 'PG Student',
+        ug_student: 'UG Student',
+        phd_scholar: 'PhD Scholar',
+        researcher: 'Researcher'
+    };
+
+    const categoryLabels = {
+        poster: 'Poster Presentation',
+        oral: 'Oral Presentation of Patent',
+        model: 'Model Presentation of Patent'
+    };
+
+    const patentLabels = {
+        published_national: 'Published National',
+        granted_national: 'Granted National',
+        published_international: 'Published International',
+        granted_international: 'Granted International'
+    };
+
+    const isPresenter = !['principal', 'tpo', 'industry_representative', 'regulatory_representative'].includes(data.participation_type);
+
+    const presenterSection = isPresenter ? `
+        <tr><td colspan="2" style="padding:16px 0 8px;font-size:15px;font-weight:700;color:#0d5c2e;border-bottom:2px solid #e8f5e9;">Presentation Details</td></tr>
+        <tr><td style="padding:10px 0;color:#666;width:40%;">Category</td><td style="padding:10px 0;color:#1a1a2e;font-weight:600;">${categoryLabels[data.presentation_category] || data.presentation_category}</td></tr>
+        <tr><td style="padding:10px 0;color:#666;">Title</td><td style="padding:10px 0;color:#1a1a2e;font-weight:600;">${data.presentation_title}</td></tr>
+        <tr><td style="padding:10px 0;color:#666;">Patent Status</td><td style="padding:10px 0;color:#1a1a2e;font-weight:600;">${patentLabels[data.patent_status] || data.patent_status || 'N/A'}</td></tr>
+    ` : '';
+
+    return `
+    <!DOCTYPE html>
+    <html>
+    <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+    <body style="margin:0;padding:0;background:#f4f7f5;font-family:'Segoe UI',Arial,sans-serif;">
+        <div style="max-width:600px;margin:0 auto;background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);margin-top:24px;margin-bottom:24px;">
+            
+            <!-- Header -->
+            <div style="background:linear-gradient(135deg,#0d5c2e,#1a9e4f);padding:36px 32px;text-align:center;">
+                <h1 style="margin:0;color:#ffffff;font-size:24px;font-weight:800;letter-spacing:0.5px;">Pharma Anveshan 2026</h1>
+                <p style="margin:6px 0 0;color:rgba(255,255,255,0.85);font-size:14px;">State-Level Conclave</p>
+            </div>
+
+            <!-- Success Banner -->
+            <div style="background:#e8f5e9;padding:20px 32px;text-align:center;border-bottom:1px solid #c8e6c9;">
+                <p style="margin:0;font-size:20px;">✅</p>
+                <h2 style="margin:8px 0 4px;color:#0d5c2e;font-size:18px;font-weight:700;">Registration Confirmed!</h2>
+                <p style="margin:0;color:#2e7d32;font-size:13px;">Registration ID: <strong>#${data.id}</strong></p>
+            </div>
+
+            <!-- Details -->
+            <div style="padding:24px 32px;">
+                <p style="margin:0 0 16px;color:#444;font-size:14px;line-height:1.6;">Dear <strong>${data.participant_name}</strong>,</p>
+                <p style="margin:0 0 20px;color:#444;font-size:14px;line-height:1.6;">Thank you for registering for <strong>Pharma Anveshan 2026</strong>. Your registration has been successfully received. Below are your details:</p>
+                
+                <table style="width:100%;border-collapse:collapse;font-size:14px;">
+                    <tr><td colspan="2" style="padding:0 0 8px;font-size:15px;font-weight:700;color:#0d5c2e;border-bottom:2px solid #e8f5e9;">Participant Information</td></tr>
+                    <tr><td style="padding:10px 0;color:#666;width:40%;">Name</td><td style="padding:10px 0;color:#1a1a2e;font-weight:600;">${data.participant_name}</td></tr>
+                    <tr><td style="padding:10px 0;color:#666;">Email</td><td style="padding:10px 0;color:#1a1a2e;font-weight:600;">${data.email}</td></tr>
+                    <tr><td style="padding:10px 0;color:#666;">Mobile</td><td style="padding:10px 0;color:#1a1a2e;font-weight:600;">${data.mobile}</td></tr>
+                    <tr><td style="padding:10px 0;color:#666;">Institute</td><td style="padding:10px 0;color:#1a1a2e;font-weight:600;">${data.institute}</td></tr>
+                    <tr><td style="padding:10px 0;color:#666;">State</td><td style="padding:10px 0;color:#1a1a2e;font-weight:600;">${data.state}</td></tr>
+                    <tr><td style="padding:10px 0;color:#666;">District</td><td style="padding:10px 0;color:#1a1a2e;font-weight:600;">${data.district}</td></tr>
+                    <tr><td style="padding:10px 0;color:#666;">Participation Type</td><td style="padding:10px 0;color:#1a1a2e;font-weight:600;">${typeLabels[data.participation_type] || data.participation_type}</td></tr>
+                    ${presenterSection}
+                </table>
+            </div>
+
+            <!-- Footer -->
+            <div style="background:#f8faf9;padding:20px 32px;text-align:center;border-top:1px solid #e8e8e8;">
+                <p style="margin:0 0 4px;color:#888;font-size:12px;">For any queries, contact us at the event helpdesk.</p>
+                <p style="margin:0;color:#aaa;font-size:11px;">© 2026 Pharma Anveshan | State-Level Conclave</p>
+            </div>
+        </div>
+    </body>
+    </html>
+    `;
+}
+
+// ── Send Confirmation Email (non-blocking) ──
+async function sendConfirmationEmail(registrationData) {
+    if (!process.env.SMTP_EMAIL || !process.env.SMTP_PASSWORD) {
+        console.log('⚠️ SMTP not configured — skipping email');
+        return;
+    }
+
+    try {
+        await transporter.sendMail({
+            from: `"Pharma Anveshan 2026" <${process.env.SMTP_EMAIL}>`,
+            to: registrationData.email,
+            subject: `✅ Registration Confirmed — Pharma Anveshan 2026 (ID #${registrationData.id})`,
+            html: buildConfirmationEmail(registrationData)
+        });
+        console.log(`📧 Confirmation email sent to ${registrationData.email}`);
+    } catch (err) {
+        console.error(`❌ Email failed for ${registrationData.email}:`, err.message);
+    }
+}
 
 // ── Create Table on Startup ──
 async function initDB() {
@@ -165,9 +279,27 @@ app.post('/api/register', async (req, res) => {
 
         console.log(`✅ Registration #${result.rows[0].id} saved (${participationType})`);
 
+        // Send confirmation email (non-blocking — doesn't delay API response)
+        const registrationRecord = {
+            id: result.rows[0].id,
+            participant_name: participantName.trim(),
+            email: email.trim().toLowerCase(),
+            mobile: mobile.trim(),
+            institute: institute.trim(),
+            state: state.trim(),
+            district: district.trim(),
+            participation_type: participationType,
+            presentation_category: isPresenter ? presentationCategory : null,
+            presentation_title: isPresenter ? (presentationTitle || '').trim() : null,
+            abstract: isPresenter ? (abstract || '').trim() : null,
+            practical_application: isPresenter ? (practicalApplication || '').trim() : null,
+            patent_status: isPresenter ? patentStatus : null
+        };
+        sendConfirmationEmail(registrationRecord); // Fire-and-forget
+
         res.status(201).json({
             success: true,
-            message: 'Registration successful! A confirmation will be sent to your email.',
+            message: 'Registration successful! A confirmation email has been sent.',
             registrationId: result.rows[0].id
         });
 
