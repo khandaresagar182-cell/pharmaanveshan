@@ -98,33 +98,24 @@ document.addEventListener('DOMContentLoaded', () => {
             const pageImageSrcs = [];
             const totalPossible = 40;
 
-            // Load pre-rendered static images provided by user
+            // Generate URLs instantly without waiting for images to download
             for (let i = 1; i <= totalPossible; i++) {
                 const num = String(i).padStart(2, '0');
-                const src = `assets/images/booklet/page-${num}.png`;
-                const exists = await new Promise(resolve => {
-                    const img = new Image();
-                    img.onload = () => resolve(src);
-                    img.onerror = () => resolve(null);
-                    img.src = src;
-                });
-                if (exists) pageImageSrcs.push(exists);
-            }
-
-            if (pageImageSrcs.length === 0) {
-                throw new Error('No booklet pages found');
+                pageImageSrcs.push(`assets/images/booklet/page-${num}.png`);
             }
 
             // ── Build flipbook pages ──
             pageImageSrcs.forEach((imgSrc, idx) => {
                 const pageDiv = document.createElement('div');
                 pageDiv.className = 'flipbook-page';
+                // Make the front and back cover behave like a hard book cover
                 if (idx === 0 || idx === pageImageSrcs.length - 1) {
                     pageDiv.setAttribute('data-density', 'hard');
                 }
                 const img = document.createElement('img');
                 img.src = imgSrc;
                 img.alt = `PCI Booklet — Page ${idx + 1}`;
+                img.loading = 'lazy'; // Lazy load images so the UI is blocked
                 pageDiv.appendChild(img);
                 flipbookEl.appendChild(pageDiv);
             });
@@ -169,6 +160,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (e.key === 'ArrowRight') pageFlip.flipNext();
                 if (e.key === 'ArrowLeft') pageFlip.flipPrev();
             });
+
+            // ── Auto-Open Animation ──
+            // Automatically flip open the cover when the user scrolls to it
+            // and auto-close the book if they scroll past it (optional invitation)
+            const observer = new IntersectionObserver((entries) => {
+                if (entries[0].isIntersecting) {
+                    if (pageFlip.getCurrentPageIndex() === 0) {
+                        setTimeout(() => {
+                            pageFlip.flipNext('top'); // 'top' gives a nice opening corner lift
+                        }, 800);
+                    }
+                    observer.disconnect();
+                }
+            }, { threshold: 0.6 });
+            observer.observe(stageEl);
 
             // Show flipbook
             loadingEl.classList.add('hidden');
