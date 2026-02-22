@@ -125,14 +125,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 width: 738,        // Match image actual width
                 height: 1024,      // Match image actual height
                 size: 'stretch',   // Let it scale down on small screens
-                minWidth: 280,
-                minHeight: 388,    // Maintained aspect ratio
-                maxWidth: 800,     // Allow slight upscale
-                maxHeight: 1110,   // Maintained aspect ratio
+                minWidth: 260,     // Reduced for very small mobiles
+                minHeight: 360,
+                maxWidth: 600,     // Reduced from 800 to prevent cropping on 1080p screens
+                maxHeight: 832,    // Maintained 738x1024 aspect ratio
                 drawShadow: true,
                 maxShadowOpacity: 0.35,
                 flippingTime: 800,
-                usePortrait: true,
+                usePortrait: true, // Switch to 1-page mode on small screens
+                autoCenter: true,  // <-- This centers the book when only 1 page is visible (cover/back)
                 startZIndex: 0,
                 autoSize: true,
                 showCover: true,
