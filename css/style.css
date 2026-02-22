@@ -2485,15 +2485,27 @@ h4.committee-name {
     border: none;
     box-shadow: none;
     padding: 0;
-    padding-bottom: 80px;
 }
 
 .reg-modal-body .btn-submit {
     position: sticky;
     bottom: 0;
     z-index: 5;
-    margin-top: 16px;
-    box-shadow: 0 -8px 24px rgba(255, 255, 255, 0.95);
+    margin: 0;
+    padding: 14px 28px;
+    background: linear-gradient(135deg, var(--navy), var(--navy-light));
+}
+
+.reg-modal-body .reg-form::after {
+    content: '';
+    display: block;
+    position: sticky;
+    bottom: 52px;
+    height: 20px;
+    background: linear-gradient(to bottom, transparent, var(--white));
+    pointer-events: none;
+    margin-left: -36px;
+    margin-right: -36px;
 }
 
 /* ── Success + Error Modals ── */
