@@ -107,7 +107,7 @@ async function sendConfirmationEmail(registrationData) {
 
     try {
         const { data, error } = await resend.emails.send({
-            from: 'Pharma Anveshan 2026 <onboarding@resend.dev>',
+            from: 'Pharma Anveshan 2026 <noreply@pharmaanveshan.in>',
             to: [registrationData.email],
             subject: `✅ Registration Confirmed — Pharma Anveshan 2026 (ID #${registrationData.id})`,
             html: buildConfirmationEmail(registrationData)
@@ -329,7 +329,7 @@ app.get('/api/test-email', async (req, res) => {
 
     try {
         const { data, error } = await resend.emails.send({
-            from: 'Pharma Anveshan 2026 <onboarding@resend.dev>',
+            from: 'Pharma Anveshan 2026 <noreply@pharmaanveshan.in>',
             to: [email],
             subject: '🧪 Test Email — Pharma Anveshan 2026',
             html: '<h2 style="color:#0d5c2e;">✅ Email is working!</h2><p>This is a test from Pharma Anveshan 2026 backend.</p>'
