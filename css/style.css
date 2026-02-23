@@ -742,6 +742,25 @@ img {
     line-height: 1.7;
 }
 
+.intro-poster {
+    float: right;
+    width: 40%;
+    max-width: 320px;
+    margin: 6px 0 16px 24px;
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-md);
+    border: 1px solid rgba(13, 92, 46, 0.1);
+}
+
+@media (max-width: 768px) {
+    .intro-poster {
+        float: none;
+        width: 100%;
+        max-width: 100%;
+        margin: 16px 0;
+    }
+}
+
 .about-text {
     min-width: 0;
 }
