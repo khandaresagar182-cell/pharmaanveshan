@@ -38,12 +38,7 @@ function buildConfirmationEmail(data) {
         model: 'Model Presentation of Patent'
     };
 
-    const patentLabels = {
-        published_national: 'Published National',
-        granted_national: 'Granted National',
-        published_international: 'Published International',
-        granted_international: 'Granted International'
-    };
+
 
     const isPresenter = !['principal', 'tpo', 'industry_representative', 'regulatory_representative'].includes(data.participation_type);
 
@@ -51,7 +46,7 @@ function buildConfirmationEmail(data) {
         <tr><td colspan="2" style="padding:16px 0 8px;font-size:15px;font-weight:700;color:#0d5c2e;border-bottom:2px solid #e8f5e9;">Presentation Details</td></tr>
         <tr><td style="padding:10px 0;color:#666;width:40%;">Category</td><td style="padding:10px 0;color:#1a1a2e;font-weight:600;">${categoryLabels[data.presentation_category] || data.presentation_category}</td></tr>
         <tr><td style="padding:10px 0;color:#666;">Title</td><td style="padding:10px 0;color:#1a1a2e;font-weight:600;">${data.presentation_title}</td></tr>
-        <tr><td style="padding:10px 0;color:#666;">Patent Status</td><td style="padding:10px 0;color:#1a1a2e;font-weight:600;">${patentLabels[data.patent_status] || data.patent_status || 'N/A'}</td></tr>
+
     ` : '';
 
     return `
@@ -202,7 +197,7 @@ app.post('/api/register', async (req, res) => {
             participantName, email, mobile, institute,
             state, district, participationType,
             presentationCategory, presentationTitle,
-            abstract, practicalApplication, patentStatus
+            abstract, practicalApplication
         } = req.body;
 
         // Required field validation — base fields
@@ -224,7 +219,7 @@ app.post('/api/register', async (req, res) => {
         const isPresenter = !nonPresenterTypes.includes(participationType);
 
         if (isPresenter) {
-            const presenterRequired = { presentationCategory, presentationTitle, abstract, practicalApplication, patentStatus };
+            const presenterRequired = { presentationCategory, presentationTitle, abstract, practicalApplication };
             const missingPresenter = Object.entries(presenterRequired)
                 .filter(([_, value]) => !value || !String(value).trim())
                 .map(([key]) => key);
@@ -261,8 +256,8 @@ app.post('/api/register', async (req, res) => {
             `INSERT INTO registrations 
                 (participant_name, email, mobile, institute, state, district,
                  participation_type, presentation_category, presentation_title, 
-                 abstract, practical_application, patent_status)
-             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+                 abstract, practical_application)
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
              RETURNING id, created_at`,
             [
                 participantName.trim(), email.trim().toLowerCase(), mobile.trim(),
@@ -271,8 +266,7 @@ app.post('/api/register', async (req, res) => {
                 isPresenter ? presentationCategory : null,
                 isPresenter ? (presentationTitle || '').trim() : null,
                 isPresenter ? (abstract || '').trim() : null,
-                isPresenter ? (practicalApplication || '').trim() : null,
-                isPresenter ? patentStatus : null
+                isPresenter ? (practicalApplication || '').trim() : null
             ]
         );
 
@@ -291,8 +285,7 @@ app.post('/api/register', async (req, res) => {
             presentation_category: isPresenter ? presentationCategory : null,
             presentation_title: isPresenter ? (presentationTitle || '').trim() : null,
             abstract: isPresenter ? (abstract || '').trim() : null,
-            practical_application: isPresenter ? (practicalApplication || '').trim() : null,
-            patent_status: isPresenter ? patentStatus : null
+            practical_application: isPresenter ? (practicalApplication || '').trim() : null
         };
         sendConfirmationEmail(registrationRecord); // Fire-and-forget
 

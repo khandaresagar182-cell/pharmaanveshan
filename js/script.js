@@ -287,7 +287,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Client-side validation — base fields always required
         const baseFields = ['participantName', 'mobile', 'email', 'institute', 'state', 'district', 'participationType'];
-        const presenterFields = ['presentationCategory', 'presentationTitle', 'abstract', 'practicalApplication', 'patentStatus'];
+        const presenterFields = ['presentationCategory', 'presentationTitle', 'abstract', 'practicalApplication'];
         const requiredFields = isPresenter ? [...baseFields, ...presenterFields] : baseFields;
 
         let hasError = false;
