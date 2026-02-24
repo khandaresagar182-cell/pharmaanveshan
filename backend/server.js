@@ -19,36 +19,8 @@ const pool = new Pool({
 // ── Resend Email Client (HTTP API — works on Railway) ──
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
-// ── Branded HTML Email Builder ──
+// ── Student/Researcher Email (Under Scrutiny) ──
 function buildConfirmationEmail(data) {
-    const typeLabels = {
-        principal: 'Principal',
-        tpo: 'TPO',
-        industry_representative: 'Industry Representative',
-        regulatory_representative: 'Regulatory Representative',
-        pg_student: 'PG Student',
-        ug_student: 'UG Student',
-        phd_scholar: 'PhD Scholar',
-        researcher: 'Researcher'
-    };
-
-    const categoryLabels = {
-        poster: 'Poster Presentation',
-        oral: 'Oral Presentation of Patent',
-        model: 'Model Presentation of Patent'
-    };
-
-
-
-    const isPresenter = !['principal', 'tpo', 'industry_representative', 'regulatory_representative'].includes(data.participation_type);
-
-    const presenterSection = isPresenter ? `
-        <tr><td colspan="2" style="padding:16px 0 8px;font-size:15px;font-weight:700;color:#0d5c2e;border-bottom:2px solid #e8f5e9;">Presentation Details</td></tr>
-        <tr><td style="padding:10px 0;color:#666;width:40%;">Category</td><td style="padding:10px 0;color:#1a1a2e;font-weight:600;">${categoryLabels[data.presentation_category] || data.presentation_category}</td></tr>
-        <tr><td style="padding:10px 0;color:#666;">Title</td><td style="padding:10px 0;color:#1a1a2e;font-weight:600;">${data.presentation_title}</td></tr>
-
-    ` : '';
-
     return `
     <!DOCTYPE html>
     <html>
@@ -58,39 +30,30 @@ function buildConfirmationEmail(data) {
             
             <!-- Header -->
             <div style="background:linear-gradient(135deg,#0d5c2e,#1a9e4f);padding:36px 32px;text-align:center;">
-                <h1 style="margin:0;color:#ffffff;font-size:24px;font-weight:800;letter-spacing:0.5px;">Pharma Anveshan 2026</h1>
+                <h1 style="margin:0;color:#ffffff;font-size:24px;font-weight:800;letter-spacing:0.5px;">PCI Pharma Anveshan 2026</h1>
                 <p style="margin:6px 0 0;color:rgba(255,255,255,0.85);font-size:14px;">State-Level Conclave</p>
             </div>
 
-            <!-- Success Banner -->
+            <!-- Banner -->
             <div style="background:#e8f5e9;padding:20px 32px;text-align:center;border-bottom:1px solid #c8e6c9;">
-                <p style="margin:0;font-size:20px;">✅</p>
-                <h2 style="margin:8px 0 4px;color:#0d5c2e;font-size:18px;font-weight:700;">Registration Confirmed!</h2>
-                <p style="margin:0;color:#2e7d32;font-size:13px;">Registration ID: <strong>#${data.id}</strong></p>
+                <p style="margin:0;font-size:20px;">📋</p>
+                <h2 style="margin:8px 0 4px;color:#0d5c2e;font-size:18px;font-weight:700;">Application Received</h2>
             </div>
 
-            <!-- Details -->
-            <div style="padding:24px 32px;">
-                <p style="margin:0 0 16px;color:#444;font-size:14px;line-height:1.6;">Dear <strong>${data.participant_name}</strong>,</p>
-                <p style="margin:0 0 20px;color:#444;font-size:14px;line-height:1.6;">Thank you for registering for <strong>Pharma Anveshan 2026</strong>. Your registration has been successfully received. Below are your details:</p>
-                
-                <table style="width:100%;border-collapse:collapse;font-size:14px;">
-                    <tr><td colspan="2" style="padding:0 0 8px;font-size:15px;font-weight:700;color:#0d5c2e;border-bottom:2px solid #e8f5e9;">Participant Information</td></tr>
-                    <tr><td style="padding:10px 0;color:#666;width:40%;">Name</td><td style="padding:10px 0;color:#1a1a2e;font-weight:600;">${data.participant_name}</td></tr>
-                    <tr><td style="padding:10px 0;color:#666;">Email</td><td style="padding:10px 0;color:#1a1a2e;font-weight:600;">${data.email}</td></tr>
-                    <tr><td style="padding:10px 0;color:#666;">Mobile</td><td style="padding:10px 0;color:#1a1a2e;font-weight:600;">${data.mobile}</td></tr>
-                    <tr><td style="padding:10px 0;color:#666;">Institute</td><td style="padding:10px 0;color:#1a1a2e;font-weight:600;">${data.institute}</td></tr>
-                    <tr><td style="padding:10px 0;color:#666;">State</td><td style="padding:10px 0;color:#1a1a2e;font-weight:600;">${data.state}</td></tr>
-                    <tr><td style="padding:10px 0;color:#666;">District</td><td style="padding:10px 0;color:#1a1a2e;font-weight:600;">${data.district}</td></tr>
-                    <tr><td style="padding:10px 0;color:#666;">Participation Type</td><td style="padding:10px 0;color:#1a1a2e;font-weight:600;">${typeLabels[data.participation_type] || data.participation_type}</td></tr>
-                    ${presenterSection}
-                </table>
+            <!-- Body -->
+            <div style="padding:32px 32px;">
+                <p style="margin:0 0 18px;color:#333;font-size:15px;line-height:1.8;">Dear Student/Researcher,</p>
+                <p style="margin:0 0 18px;color:#444;font-size:14px;line-height:1.8;">Thank you for registering for <strong>PCI Pharma Anveshan 2026</strong> organized by <strong>Yashoda Technical Campus, Satara</strong>.</p>
+                <p style="margin:0 0 18px;color:#444;font-size:14px;line-height:1.8;">Your application is under scrutiny. The confirmation email will be sent to you shortly after verification.</p>
+                <p style="margin:24px 0 4px;color:#333;font-size:14px;line-height:1.8;">Best Regards,</p>
+                <p style="margin:0;color:#0d5c2e;font-size:15px;font-weight:700;">Organizing Committee</p>
+                <p style="margin:4px 0 0;color:#666;font-size:13px;">PCI Pharma Anveshan 2026</p>
             </div>
 
             <!-- Footer -->
             <div style="background:#f8faf9;padding:20px 32px;text-align:center;border-top:1px solid #e8e8e8;">
                 <p style="margin:0 0 4px;color:#888;font-size:12px;">For any queries, contact us at the event helpdesk.</p>
-                <p style="margin:0;color:#aaa;font-size:11px;">© 2026 Pharma Anveshan | State-Level Conclave</p>
+                <p style="margin:0;color:#aaa;font-size:11px;">© 2026 PCI Pharma Anveshan | Yashoda Technical Campus, Satara</p>
             </div>
         </div>
     </body>
@@ -152,7 +115,7 @@ async function sendConfirmationEmail(registrationData) {
         const isVIP = nonPresenterTypes.includes(registrationData.participation_type);
         const subject = isVIP
             ? 'Registration Confirmed — PCI Pharma Anveshan 2026'
-            : `✅ Registration Confirmed — Pharma Anveshan 2026 (ID #${registrationData.id})`;
+            : 'Application Received — PCI Pharma Anveshan 2026';
         const html = isVIP
             ? buildVIPConfirmationEmail(registrationData)
             : buildConfirmationEmail(registrationData);
