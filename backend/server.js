@@ -98,6 +98,49 @@ function buildConfirmationEmail(data) {
     `;
 }
 
+// ── Formal VIP Email (for Principal / TPO / Industry & Regulatory Reps) ──
+function buildVIPConfirmationEmail(data) {
+    return `
+    <!DOCTYPE html>
+    <html>
+    <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+    <body style="margin:0;padding:0;background:#f4f7f5;font-family:'Segoe UI',Arial,sans-serif;">
+        <div style="max-width:600px;margin:0 auto;background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);margin-top:24px;margin-bottom:24px;">
+            
+            <!-- Header -->
+            <div style="background:linear-gradient(135deg,#0d5c2e,#1a9e4f);padding:36px 32px;text-align:center;">
+                <h1 style="margin:0;color:#ffffff;font-size:24px;font-weight:800;letter-spacing:0.5px;">PCI Pharma Anveshan 2026</h1>
+                <p style="margin:6px 0 0;color:rgba(255,255,255,0.85);font-size:14px;">State-Level Conclave</p>
+            </div>
+
+            <!-- Success Banner -->
+            <div style="background:#e8f5e9;padding:20px 32px;text-align:center;border-bottom:1px solid #c8e6c9;">
+                <p style="margin:0;font-size:20px;">✅</p>
+                <h2 style="margin:8px 0 4px;color:#0d5c2e;font-size:18px;font-weight:700;">Registration Accepted</h2>
+            </div>
+
+            <!-- Body -->
+            <div style="padding:32px 32px;">
+                <p style="margin:0 0 18px;color:#333;font-size:15px;line-height:1.8;">Dear Sir/Madam,</p>
+                <p style="margin:0 0 18px;color:#444;font-size:14px;line-height:1.8;">Thank you for registering for <strong>PCI Pharma Anveshan 2026</strong>, organized by <strong>Yashoda Technical Campus, Satara</strong>.</p>
+                <p style="margin:0 0 18px;color:#444;font-size:14px;line-height:1.8;">Your registration has been successfully accepted. You are most welcome to attend the biggest one-day state-level pharma conclave.</p>
+                <p style="margin:0 0 18px;color:#444;font-size:14px;line-height:1.8;">We look forward to your valuable participation.</p>
+                <p style="margin:24px 0 4px;color:#333;font-size:14px;line-height:1.8;">Regards,</p>
+                <p style="margin:0;color:#0d5c2e;font-size:15px;font-weight:700;">Organizing Committee</p>
+                <p style="margin:4px 0 0;color:#666;font-size:13px;">PCI Pharma Anveshan 2026</p>
+            </div>
+
+            <!-- Footer -->
+            <div style="background:#f8faf9;padding:20px 32px;text-align:center;border-top:1px solid #e8e8e8;">
+                <p style="margin:0 0 4px;color:#888;font-size:12px;">For any queries, contact us at the event helpdesk.</p>
+                <p style="margin:0;color:#aaa;font-size:11px;">© 2026 PCI Pharma Anveshan | Yashoda Technical Campus, Satara</p>
+            </div>
+        </div>
+    </body>
+    </html>
+    `;
+}
+
 // ── Send Confirmation Email (non-blocking) ──
 async function sendConfirmationEmail(registrationData) {
     if (!resend) {
@@ -106,11 +149,19 @@ async function sendConfirmationEmail(registrationData) {
     }
 
     try {
+        const isVIP = nonPresenterTypes.includes(registrationData.participation_type);
+        const subject = isVIP
+            ? 'Registration Confirmed — PCI Pharma Anveshan 2026'
+            : `✅ Registration Confirmed — Pharma Anveshan 2026 (ID #${registrationData.id})`;
+        const html = isVIP
+            ? buildVIPConfirmationEmail(registrationData)
+            : buildConfirmationEmail(registrationData);
+
         const { data, error } = await resend.emails.send({
             from: 'Pharma Anveshan 2026 <noreply@pharmaanveshan.in>',
             to: [registrationData.email],
-            subject: `✅ Registration Confirmed — Pharma Anveshan 2026 (ID #${registrationData.id})`,
-            html: buildConfirmationEmail(registrationData)
+            subject,
+            html
         });
 
         if (error) {
