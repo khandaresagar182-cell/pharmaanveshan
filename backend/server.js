@@ -8,8 +8,19 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // ── Middleware ──
-app.use(cors());
-app.use(express.json());
+// Explicit CORS — required for live cross-origin requests (e.g. pharmaanveshan.in → Railway)
+const corsOptions = {
+    origin: '*',                 // Allow all origins (public registration site)
+    methods: ['GET', 'POST', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    optionsSuccessStatus: 200    // Some browsers (IE11) choke on 204
+};
+app.use(cors(corsOptions));
+
+// Handle all OPTIONS preflight requests explicitly (critical for POST with JSON body)
+app.options('*', cors(corsOptions));
+
+app.use(express.json({ limit: '2mb' }));
 
 // ── Database Connection ──
 const pool = new Pool({

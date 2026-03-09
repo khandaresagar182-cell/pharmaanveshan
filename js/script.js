@@ -316,22 +316,34 @@ document.addEventListener('DOMContentLoaded', () => {
         submitBtn.classList.add('loading');
         submitBtn.querySelector('span').textContent = 'Submitting...';
 
+        // 15-second timeout — handles Railway cold-starts
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 15000);
+
         try {
             const response = await fetch(`${API_URL}/api/register`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
+                body: JSON.stringify(data),
+                signal: controller.signal
             });
 
-            const result = await response.json();
+            clearTimeout(timeoutId);
+
+            let result;
+            try {
+                result = await response.json();
+            } catch (_) {
+                // Server returned non-JSON (e.g. HTML error page from Railway)
+                throw new Error(`Server error (HTTP ${response.status}). Please try again shortly.`);
+            }
 
             if (result.success) {
-                closeRegModal(); // Close registration popup
+                closeRegModal();
                 successModal.classList.add('active');
                 regForm.reset();
-                togglePresentationFields(); // Restore default field visibility
+                togglePresentationFields();
             } else {
-                // Highlight specific field if backend returns it
                 if (result.field) {
                     showFieldError(result.field, result.message);
                 } else {
@@ -340,11 +352,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         } catch (err) {
+            clearTimeout(timeoutId);
             console.error('Registration error:', err);
-            errorMessage.textContent = 'Network error. Please check your connection and try again.';
+
+            let msg;
+            if (err.name === 'AbortError') {
+                msg = 'Request timed out. The server may be starting up — please wait a moment and try again.';
+            } else if (!navigator.onLine) {
+                msg = 'No internet connection. Please check your network and try again.';
+            } else {
+                msg = 'Unable to reach the registration server. Please try again in a few seconds.';
+            }
+
+            errorMessage.textContent = msg;
             errorModal.classList.add('active');
         } finally {
-            // Reset button
             submitBtn.disabled = false;
             submitBtn.classList.remove('loading');
             submitBtn.querySelector('span').textContent = 'Submit Registration';
