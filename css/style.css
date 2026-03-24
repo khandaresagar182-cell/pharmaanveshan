@@ -2694,3 +2694,115 @@ h4.committee-name {
         padding: 16px 20px 24px;
     }
 }
+
+/* ──────────────────────────────────────────
+   EVENT ENDED SECTION
+   ────────────────────────────────────────── */
+.event-ended-section {
+    background: var(--bg-light);
+}
+
+.event-ended-card {
+    max-width: 720px;
+    margin: 0 auto;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 48px 40px;
+    text-align: center;
+    box-shadow: var(--shadow-md);
+    position: relative;
+    overflow: hidden;
+}
+
+.event-ended-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 5px;
+    background: linear-gradient(90deg, var(--gold), var(--saffron), var(--navy));
+}
+
+.event-ended-icon {
+    font-size: 3.5rem;
+    margin-bottom: 16px;
+    animation: celebratePulse 2s ease-in-out infinite;
+}
+
+@keyframes celebratePulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+.event-ended-title {
+    font-family: var(--font-heading);
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--navy);
+    margin-bottom: 20px;
+}
+
+.event-ended-text {
+    font-size: 1rem;
+    color: var(--text-body);
+    line-height: 1.8;
+    margin-bottom: 14px;
+    max-width: 580px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.event-ended-badge {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-top: 24px;
+}
+
+.event-ended-badge span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--navy);
+    background: rgba(13, 92, 46, 0.08);
+    border: 1px solid rgba(13, 92, 46, 0.15);
+    padding: 8px 18px;
+    border-radius: 20px;
+}
+
+/* Hero "Event Concluded" Badge */
+.btn-ended {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-heading);
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--white);
+    background: linear-gradient(135deg, rgba(46, 204, 113, 0.25), rgba(39, 174, 96, 0.15));
+    border: 2px solid rgba(46, 204, 113, 0.5);
+    padding: 14px 32px;
+    border-radius: var(--radius-sm);
+    letter-spacing: 0.5px;
+}
+
+@media (max-width: 600px) {
+    .event-ended-card {
+        padding: 32px 20px;
+    }
+
+    .event-ended-title {
+        font-size: 1.4rem;
+    }
+
+    .event-ended-badge {
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+    }
+}

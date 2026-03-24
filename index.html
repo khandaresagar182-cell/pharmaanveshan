@@ -55,10 +55,7 @@
                     <div class="gov-dropdown-menu" id="govMenu">
                         <a href="#home">Home</a>
                         <a href="#about">About</a>
-
                         <a href="#committee">Committee</a>
-                        <a href="#"
-                            onclick="document.getElementById('regModal').classList.add('active');return false;">Register</a>
                         <a href="#contact">Contact</a>
                     </div>
                 </div>
@@ -114,8 +111,7 @@
             </div>
 
             <div class="hero-cta">
-                <a href="#" class="btn-primary"
-                    onclick="document.getElementById('regModal').classList.add('active');return false;">Register Now</a>
+                <span class="btn-ended">✅ Event Successfully Concluded</span>
             </div>
         </div>
     </section>
@@ -401,124 +397,29 @@
 
 
 
-    <!-- ============ REGISTRATION POPUP MODAL ============ -->
-    <div class="reg-modal-overlay" id="regModal">
-        <div class="reg-modal">
-            <button class="reg-modal-close" id="regModalClose" aria-label="Close">
-                <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5"
-                    stroke-linecap="round">
-                    <path d="M18 6L6 18M6 6l12 12" />
-                </svg>
-            </button>
-            <div class="reg-modal-header">
-                <h2>Register for Pharma Anveshan 2026</h2>
-                <p>Secure your seat at the State-Level Conclave</p>
-            </div>
-            <div class="reg-modal-body">
-                <form class="reg-form" id="registrationForm">
-
-                    <!-- Row 1: Name & Mobile -->
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="participantName">Name of Participant <span class="req">*</span></label>
-                            <input type="text" id="participantName" name="participantName"
-                                placeholder="Enter your full name" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="mobile">Mobile Number <span class="req">*</span></label>
-                            <input type="tel" id="mobile" name="mobile" placeholder="+91 XXXXX XXXXX" required>
-                        </div>
-                    </div>
-
-                    <!-- Row 2: Email & Institute -->
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="email">Email ID <span class="req">*</span></label>
-                            <input type="email" id="email" name="email" placeholder="Enter your email" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="institute">Name of Institute / Organisation <span class="req">*</span></label>
-                            <input type="text" id="institute" name="institute"
-                                placeholder="Enter your institute or organisation" required>
-                        </div>
-                    </div>
-
-                    <!-- Row 3: State & District -->
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="state">State <span class="req">*</span></label>
-                            <input type="text" id="state" name="state" placeholder="Enter your state" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="district">District <span class="req">*</span></label>
-                            <input type="text" id="district" name="district" placeholder="Enter your district" required>
-                        </div>
-                    </div>
-
-                    <!-- Type of Participation -->
-                    <div class="form-group full-width">
-                        <label for="participationType">Type of Participation <span class="req">*</span></label>
-                        <select id="participationType" name="participationType" required>
-                            <option value="">Select type of participation</option>
-                            <option value="principal">Principal</option>
-                            <option value="tpo">TPO</option>
-                            <option value="industry_representative">Industry Representative</option>
-                            <option value="regulatory_representative">Regulatory Representative</option>
-                            <option value="pg_student">PG Student</option>
-                            <option value="ug_student">UG Student</option>
-                            <option value="phd_scholar">PhD Scholar</option>
-                            <option value="researcher">Researcher</option>
-                        </select>
-                    </div>
-
-                    <!-- ═══ Presentation Fields (conditional — hidden for Principal/TPO/Industry/Regulatory) ═══ -->
-                    <div id="presentationFields" class="presentation-fields">
-
-                        <div class="form-group full-width">
-                            <label for="presentationCategory">Category of Presentation <span
-                                    class="req">*</span></label>
-                            <select id="presentationCategory" name="presentationCategory">
-                                <option value="">Select category of presentation</option>
-                                <option value="poster">1. Poster Presentation (Promising Academic Research with Industry
-                                    Potential)
-                                </option>
-                                <option value="oral">2. Oral Presentation of Patent</option>
-                                <option value="model">3. Model Presentation of Patent</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group full-width">
-                            <label for="presentationTitle">Title of Presentation <span class="req">*</span></label>
-                            <input type="text" id="presentationTitle" name="presentationTitle"
-                                placeholder="Enter the title of your presentation">
-                        </div>
-
-                        <div class="form-group full-width">
-                            <label for="abstract">Abstract <span class="req">*</span></label>
-                            <textarea id="abstract" name="abstract" rows="4"
-                                placeholder="Enter the abstract of your presentation"></textarea>
-                        </div>
-
-                        <div class="form-group full-width">
-                            <label for="practicalApplication">Practical Application <span class="req">*</span></label>
-                            <textarea id="practicalApplication" name="practicalApplication" rows="3"
-                                placeholder="Describe the practical application"></textarea>
-                        </div>
-
-
-                    </div>
-
-                    <button type="submit" class="btn-submit" id="submitBtn">
-                        <span>Submit Registration</span>
-                        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor"
-                            stroke-width="2">
-                            <path d="M5 12h14M12 5l7 7-7 7" />
-                        </svg>
-                    </button>
-                </form>
+    <!-- ============ EVENT ENDED NOTICE ============ -->
+    <section class="section event-ended-section" id="event-ended">
+        <div class="container">
+            <div class="event-ended-card">
+                <div class="event-ended-icon">🎉</div>
+                <h2 class="event-ended-title">Event Successfully Concluded!</h2>
+                <p class="event-ended-text">
+                    <strong>Pharma Anveshan 2026</strong> was held on <strong>14th March 2026</strong> at 
+                    Yashoda Technical Campus, Faculty of Pharmacy, Satara. The conclave brought together 
+                    academicians, researchers, industry experts, and regulatory authorities for a day of 
+                    meaningful dialogue and collaboration.
+                </p>
+                <p class="event-ended-text">
+                    We sincerely thank all the participants, speakers, and organising committee members 
+                    for making this event a grand success.
+                </p>
+                <div class="event-ended-badge">
+                    <span>📅 14th March 2026</span>
+                    <span>📍 Yashoda Technical Campus, Satara</span>
+                </div>
             </div>
         </div>
-    </div>
+    </section>
 
 
 
@@ -588,10 +489,6 @@
                         <li><a href="#home">Home</a></li>
                         <li><a href="#about">About Programme</a></li>
 
-
-                        <li><a href="#"
-                                onclick="document.getElementById('regModal').classList.add('active');return false;">Registration</a>
-                        </li>
                         <li><a href="#contact">Contact Us</a></li>
                     </ul>
                 </div>
@@ -634,28 +531,7 @@
         </div>
     </footer>
 
-    <!-- Success Modal -->
-    <div class="modal-overlay" id="successModal">
-        <div class="modal-box">
-            <div class="modal-icon">✅</div>
-            <h3>Registration Successful!</h3>
-            <p>Thank you for registering for Pharma Anveshan 2026. A confirmation email will be sent to your registered
-                email address.</p>
-            <button class="btn-primary"
-                onclick="document.getElementById('successModal').classList.remove('active')">Close</button>
-        </div>
-    </div>
 
-    <!-- Error Modal -->
-    <div class="modal-overlay" id="errorModal">
-        <div class="modal-box modal-error">
-            <div class="modal-icon">❌</div>
-            <h3>Registration Failed</h3>
-            <p id="errorMessage">Something went wrong. Please try again.</p>
-            <button class="btn-primary" onclick="document.getElementById('errorModal').classList.remove('active')">Try
-                Again</button>
-        </div>
-    </div>
 
     <!-- Flipbook Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
